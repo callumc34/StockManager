@@ -20,14 +20,10 @@ namespace StockManager.Manager
         public IStockManager RemoveStock(int productID);
 
         /// <summary>
-        /// Adds one more stock with given product ID to the stock manager.
+        /// Remove all stock from the stocks manager.
         /// </summary>
-        /// <param name="productID">The product ID to update.</param>
-        /// <returns>Returns the StockManager with updated information.</returns>
-        public IStockManager AddStock(int productID)
-        {
-            return this.AddStock(productID, 1);
-        }
+        /// <returns>Returns the Stockmanager with updated information.</returns>
+        public IStockManager RemoveAllStock();
 
         /// <summary>
         /// Adds an extra quantity of stock with given product ID to the stock manager.
@@ -35,18 +31,7 @@ namespace StockManager.Manager
         /// <param name="productID">The product ID to update.</param>
         /// <param name="quantity">Number of stock to add.</param>
         /// <returns>The StockManager with updated information.</returns>
-        public IStockManager AddStock(int productID, int quantity);
-
-        /// <summary>
-        /// Sells a stock with a given price.
-        /// </summary>
-        /// <param name="productID">The product ID to sell.</param>
-        /// <param name="price">Price of the sale.</param>
-        /// <returns>The StockManager with updated information.</returns>
-        public IStockManager SellStock(int productID, double price)
-        {
-            return this.SellStock(productID, 1, price);
-        }
+        public IStockManager AddStock(int productID, int quantity = 1);
 
         /// <summary>
         /// Sells a number of stock with a given price per stock.
@@ -55,7 +40,7 @@ namespace StockManager.Manager
         /// <param name="quantity">Number of stock to sell.</param>
         /// <param name="pricePerStock">Price to sell each stock at.</param>
         /// <returns>The StockManager with updated information.</returns>
-        public IStockManager SellStock(int productID, int quantity, double pricePerStock);
+        public IStockManager SellStock(int productID, double pricePerStock, int quantity = 1);
 
         /// <summary>
         /// Return all of the stocks in the manager.
@@ -75,14 +60,14 @@ namespace StockManager.Manager
         /// </summary>
         /// <param name="description">Description to search for.</param>
         /// <returns>Returns the stock if exists otherwise null.</returns>
-        public Stock GetStockFromDescription(string description);
+        public Stock? GetStockFromDescription(string description);
 
         /// <summary>
         /// Gets the stock from the product ID.
         /// </summary>
         /// <param name="productID">Product ID to search for.</param>
         /// <returns>Returns the stock if exists otherwise null.</returns>
-        public Stock GetStockFromProductID(int productID);
+        public Stock? GetStockFromProductID(int productID);
 
         /// <summary>
         /// Gets the number of a given stock sold.

@@ -34,13 +34,7 @@ namespace StockManager.Database
         /// <returns>True if stock exists, false otherwise.</returns>
         public bool StockExists(int productID)
         {
-            List<DatabaseStock> stocks = this.GetCollection().Find(x => x.ProductID == productID).ToList();
-            if (!stocks.Any())
-            {
-                return false;
-            }
-
-            return true;
+            return this.GetCollection().Find(x => x.ProductID == productID).Any();
         }
 
         /// <summary>

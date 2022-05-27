@@ -6,6 +6,16 @@ namespace StockManager.Manager
     public class Stock
     {
         /// <summary>
+        /// Internal description.
+        /// </summary>
+        protected string description;
+
+        /// <summary>
+        /// Internal product ID.
+        /// </summary>
+        protected int productID;
+
+        /// <summary>
         /// Gets or sets the price field.
         /// </summary>
         public double Price { get; set; }
@@ -13,12 +23,12 @@ namespace StockManager.Manager
         /// <summary>
         /// Gets the description of a stock.
         /// </summary>
-        public string Description { get; }
+        public string Description { get { return this.description; } }
 
         /// <summary>
         /// Gets the product ID.
         /// </summary>
-        public int ProductID { get; }
+        public int ProductID { get { return this.productID;  } }
 
         /// <summary>
         /// Gets or sets the safe stock amount.
@@ -52,8 +62,8 @@ namespace StockManager.Manager
         public Stock(double price, string description, int productID, int safeStockAmount, int quantity)
         {
             this.Price = price;
-            this.Description = description;
-            this.ProductID = productID;
+            this.description = description;
+            this.productID = productID;
             this.SafeStockAmount = safeStockAmount;
             this.Quantity = quantity;
             this.TotalFromSales = 0;

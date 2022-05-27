@@ -3,6 +3,8 @@
 [Oo]bj/
 [Bb]in/
 [Dd]ebug/
+[Rr]elease/
+[Dd]ocs/
 .nuget/
 packages/
 artifacts/

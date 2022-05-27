@@ -16,14 +16,16 @@ namespace StockManager.Database
         public ObjectId _id { get; set; }
 
         /// <summary>
-        /// Gets or sets the description of the stock.
+        /// Gets or sets the stock's description for use with MongoDB.
         /// </summary>
-        public string Description { get; set; } = null!;
+        [BsonElement]
+        public new string Description { get { return this.description; } set { this.description = value; } }
 
         /// <summary>
-        /// Gets or sets the stock product ID.
+        /// Gets or sets the product ID for use with MongoDB.
         /// </summary>
-        public int ProductID { get; set; }
+        [BsonElement]
+        public new int ProductID { get { return this.productID; } set { this.productID = value; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseStock"/> class.
@@ -34,11 +36,10 @@ namespace StockManager.Database
         /// <param name="productID">Product ID of the stock.</param>
         /// <param name="safeStockAmount">Quantity of stock to stay above without needing to reorder.</param>
         /// <param name="quantity">Amount of stock.</param>
+        [BsonConstructor]
         public DatabaseStock(double price, string description, int productID, int safeStockAmount, int quantity)
             : base(price, description, productID, safeStockAmount, quantity)
         {
-            this.Description = description;
-            this.ProductID = productID;
         }
 
 
@@ -49,8 +50,6 @@ namespace StockManager.Database
         public DatabaseStock(Stock stock)
             : base(stock.Price, stock.Description, stock.ProductID, stock.SafeStockAmount, stock.Quantity)
         {
-            this.Description = stock.Description;
-            this.ProductID = stock.ProductID;
         }
     }
 }

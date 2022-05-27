@@ -35,7 +35,7 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
-        public IStockManager AddStock(int productID, int quantity)
+        public IStockManager AddStock(int productID, int quantity = 1)
         {
             if (!this.database.StockExists(productID))
             {
@@ -43,7 +43,29 @@ namespace StockManager.Database
             }
 
             var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
-            var update = Builders<DatabaseStock>.Update.Set("Quantity", this.GetStockFromProductID(productID).Quantity);
+            var update = Builders<DatabaseStock>.Update.Set("Quantity", this.GetStockFromProductID(productID).Quantity + quantity);
+            this.database.GetCollection().UpdateOne(filter, update);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IStockManager SellStock(int productID, double pricePerStock, int quantity = 1)
+        {
+            Stock? stock = this.GetStockFromProductID(productID);
+
+            if (stock == null)
+            {
+                return this;
+            }
+
+            stock.Quantity -= quantity;
+            stock.NumberSold += quantity;
+            stock.TotalFromSales += quantity * pricePerStock;
+
+            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
+            var update = Builders<DatabaseStock>.Update.Set("Quantity", stock.Quantity)
+                .Set("NumberSold", stock.NumberSold)
+                .Set("TotalFromSales", stock.TotalFromSales);
             this.database.GetCollection().UpdateOne(filter, update);
             return this;
         }
@@ -56,7 +78,13 @@ namespace StockManager.Database
                 return -1;
             }
 
-            return this.GetStockFromProductID(productID).NumberSold;
+            Stock? stock = this.GetStockFromProductID(productID);
+            if (stock != null)
+            {
+                return stock.NumberSold;
+            }
+
+            return -1;
         }
 
         /// <inheritdoc />
@@ -70,20 +98,26 @@ namespace StockManager.Database
         public int GetProductIDFromDescription(string description)
         {
             var filter = Builders<DatabaseStock>.Filter.Eq("Description", description);
-            return this.database.GetCollection().Find(filter).First().ProductID;
+            Stock found =  this.database.GetCollection().Find(filter).FirstOrDefault();
+            if (found != null)
+            {
+                return found.ProductID;
+            }
+
+            return -1;
         }
 
         /// <inheritdoc />
-        public Stock GetStockFromDescription(string description)
+        public Stock? GetStockFromDescription(string description)
         {
             return this.GetStockFromProductID(this.GetProductIDFromDescription(description));
         }
 
         /// <inheritdoc />
-        public Stock GetStockFromProductID(int productID)
+        public Stock? GetStockFromProductID(int productID)
         {
             var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
-            return this.database.GetCollection().Find(filter).First();
+            return this.database.GetCollection().Find(filter).FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -100,7 +134,14 @@ namespace StockManager.Database
         /// <inheritdoc />
         public double GetTotalMoneyFromStock(int productID)
         {
-            return this.GetStockFromProductID(productID).TotalFromSales;
+            Stock? stock = this.GetStockFromProductID(productID);
+
+            if (stock != null)
+            {
+                return stock.TotalFromSales;
+            }
+
+            return -1;
         }
 
         /// <inheritdoc />
@@ -112,17 +153,9 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
-        public IStockManager SellStock(int productID, int quantity, double pricePerStock)
+        public IStockManager RemoveAllStock()
         {
-            Stock stock = this.GetStockFromProductID(productID);
-
-            stock.Quantity -= quantity;
-            stock.NumberSold += quantity;
-            stock.TotalFromSales += quantity * pricePerStock;
-
-            this.RemoveStock(productID);
-            this.AddNewStock(stock);
-
+            this.database.GetCollection().DeleteMany(_ => true);
             return this;
         }
     }
