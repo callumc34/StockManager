@@ -58,6 +58,12 @@ namespace StockManager.Manager
         public IStockManager SellStock(int productID, int quantity, double pricePerStock);
 
         /// <summary>
+        /// Return all of the stocks in the manager.
+        /// </summary>
+        /// <returns>List of all stocks.</returns>
+        public List<Stock> GetAllStocks();
+
+        /// <summary>
         /// Gets the product ID from a stock description.
         /// </summary>
         /// <param name="description">Description to search for.</param>
@@ -69,14 +75,14 @@ namespace StockManager.Manager
         /// </summary>
         /// <param name="description">Description to search for.</param>
         /// <returns>Returns the stock if exists otherwise null.</returns>
-        public Stock? GetStockFromDescription(string description);
+        public Stock GetStockFromDescription(string description);
 
         /// <summary>
         /// Gets the stock from the product ID.
         /// </summary>
         /// <param name="productID">Product ID to search for.</param>
         /// <returns>Returns the stock if exists otherwise null.</returns>
-        public Stock? GetStockFromProductID(int productID);
+        public Stock GetStockFromProductID(int productID);
 
         /// <summary>
         /// Gets the number of a given stock sold.

@@ -6,31 +6,6 @@ namespace StockManager.Manager
     public class Stock
     {
         /// <summary>
-        /// The price of the stock.
-        /// </summary>
-        private double price;
-
-        /// <summary>
-        /// The description of the stock.
-        /// </summary>
-        private string description;
-
-        /// <summary>
-        /// Product ID of the stock.
-        /// </summary>
-        private int productID;
-
-        /// <summary>
-        /// Stock amount to not fall under without ordering more.
-        /// </summary>
-        private int safeStockAmount;
-
-        /// <summary>
-        /// Number of stock on hand.
-        /// </summary>
-        private int quantity;
-
-        /// <summary>
         /// Gets or sets the price field.
         /// </summary>
         public double Price { get; set; }
@@ -56,6 +31,16 @@ namespace StockManager.Manager
         public int Quantity { get; set; }
 
         /// <summary>
+        /// Gets or sets the total from sales.
+        /// </summary>
+        public double TotalFromSales { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of this stock sold.
+        /// </summary>
+        public int NumberSold { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Stock"/> class.
         /// Creates a new Stock.
         /// </summary>
@@ -63,15 +48,16 @@ namespace StockManager.Manager
         /// <param name="description">Description of the stock.</param>
         /// <param name="productID">Product ID of the stock.</param>
         /// <param name="safeStockAmount">Quantity of stock to stay above without needing to reorder.</param>
-        /// <param name="amount">Amount of stock.</param>
-        public Stock(double price, string description, int productID, int safeStockAmount, int amount)
+        /// <param name="quantity">Amount of stock.</param>
+        public Stock(double price, string description, int productID, int safeStockAmount, int quantity)
         {
-            this.price = price;
-            this.description = description;
-            this.productID = productID;
-            this.safeStockAmount = safeStockAmount;
-            this.quantity = amount;
+            this.Price = price;
+            this.Description = description;
+            this.ProductID = productID;
+            this.SafeStockAmount = safeStockAmount;
+            this.Quantity = quantity;
+            this.TotalFromSales = 0;
+            this.NumberSold = 0;
         }
-
     }
 }

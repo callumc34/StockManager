@@ -2,7 +2,7 @@ namespace StockManager.UI
 {
     using System.Windows;
     using Microsoft.Extensions.Configuration;
-    using StockManager.Manager;
+    using StockManager.Database;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -17,13 +17,13 @@ namespace StockManager.UI
         /// <summary>
         ///  Stock database for the app.
         /// </summary>
-        private static StockDatabase stockManager = new StockDatabase(Configuration["uri"]);
+        private static DatabaseStockManager stockManager = new DatabaseStockManager(Configuration["uri"]);
 
         /// <summary>
         /// Gets the stock manager.
         /// </summary>
         /// <returns>The stock manager.</returns>
-        public StockDatabase GetStockManager()
+        public static DatabaseStockManager GetStockManager()
         {
             return stockManager;
         }
