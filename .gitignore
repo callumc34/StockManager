@@ -1,0 +1,11 @@
+# Microsoft Visual Studio
+.vs
+[Oo]bj/
+[Bb]in/
+[Dd]ebug/
+.nuget/
+packages/
+artifacts/
+
+# Config file
+appsettings.json
