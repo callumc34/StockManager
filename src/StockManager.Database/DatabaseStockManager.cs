@@ -1,6 +1,9 @@
 namespace StockManager.Database
 {
+    using System.Globalization;
     using System.Text;
+    using CsvHelper;
+    using CsvHelper.Configuration;
     using MongoDB.Driver;
     using StockManager.Manager;
 
@@ -37,14 +40,30 @@ namespace StockManager.Database
         /// <inheritdoc />
         public IStockManager AddStock(int productID, int quantity = 1)
         {
-            if (!this.database.StockExists(productID))
+            Stock? stock = this.GetStockFromProductID(productID);
+            if (stock == null)
             {
                 return this;
             }
 
             var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
-            var update = Builders<DatabaseStock>.Update.Set("Quantity", this.GetStockFromProductID(productID).Quantity + quantity);
+            var update = Builders<DatabaseStock>.Update.Set("Quantity", stock.Quantity + quantity);
             this.database.GetCollection().UpdateOne(filter, update);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IStockManager RemoveStock(int productID)
+        {
+            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
+            this.database.GetCollection().DeleteMany(filter);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IStockManager RemoveAllStock()
+        {
+            this.database.GetCollection().DeleteMany(_ => true);
             return this;
         }
 
@@ -58,14 +77,60 @@ namespace StockManager.Database
                 return this;
             }
 
+            if (quantity <= 0 || quantity > stock.Quantity)
+            {
+                return this;
+            }
+
             stock.Quantity -= quantity;
             stock.NumberSold += quantity;
             stock.TotalFromSales += quantity * pricePerStock;
+
+            if (stock.Quantity < stock.SafeStockAmount)
+            {
+                int oneHundredDollarsWorth = (int)Math.Floor(100 / stock.Price);
+                int order = (oneHundredDollarsWorth == 0) ? 1 : oneHundredDollarsWorth;
+                // Always order at least one.
+                stock.Quantity += order;
+                this.ProduceStockOrder(stock.ProductID, stock.Description, order);
+            }
 
             var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
             var update = Builders<DatabaseStock>.Update.Set("Quantity", stock.Quantity)
                 .Set("NumberSold", stock.NumberSold)
                 .Set("TotalFromSales", stock.TotalFromSales);
+            this.database.GetCollection().UpdateOne(filter, update);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IStockManager EditStockPrice(int productID, double pricePerStock)
+        {
+            Stock? stock = this.GetStockFromProductID(productID);
+
+            if (stock == null)
+            {
+                return this;
+            }
+
+            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
+            var update = Builders<DatabaseStock>.Update.Set("Price", pricePerStock);
+            this.database.GetCollection().UpdateOne(filter, update);
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public IStockManager EditSafeStockAmount(int productID, int safeStockAmount)
+        {
+            Stock? stock = this.GetStockFromProductID(productID);
+
+            if (stock == null)
+            {
+                return this;
+            }
+
+            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
+            var update = Builders<DatabaseStock>.Update.Set("SafeStockAmount", safeStockAmount);
             this.database.GetCollection().UpdateOne(filter, update);
             return this;
         }
@@ -95,10 +160,19 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
+        public List<Stock> SearchForStockFromDescription(string description)
+        {
+            IEnumerable<Stock> stocks = this.database.GetCollection()
+                .AsQueryable()
+                .Where(s => s.Description.ToLower().Contains(description.ToLower()))
+                .ToList();
+            return stocks.ToList();
+        }
+
+        /// <inheritdoc />
         public int GetProductIDFromDescription(string description)
         {
-            var filter = Builders<DatabaseStock>.Filter.Eq("Description", description);
-            Stock found =  this.database.GetCollection().Find(filter).FirstOrDefault();
+            Stock? found = this.SearchForStockFromDescription(description).FirstOrDefault();
             if (found != null)
             {
                 return found.ProductID;
@@ -110,7 +184,7 @@ namespace StockManager.Database
         /// <inheritdoc />
         public Stock? GetStockFromDescription(string description)
         {
-            return this.GetStockFromProductID(this.GetProductIDFromDescription(description));
+            return this.SearchForStockFromDescription(description).FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -145,18 +219,23 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
-        public IStockManager RemoveStock(int productID)
+        public void ProduceStockOrder(int productID, string description, int amount)
         {
-            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
-            this.database.GetCollection().DeleteMany(filter);
-            return this;
-        }
+            if (!File.Exists("StockOrder.csv"))
+            {
+                File.Create("StockOrder.csv");
+            }
 
-        /// <inheritdoc />
-        public IStockManager RemoveAllStock()
-        {
-            this.database.GetCollection().DeleteMany(_ => true);
-            return this;
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false,
+            };
+            using (var stream = File.Open("StockOfer.csv", FileMode.Append))
+            using (var csv = new CsvWriter(new StreamWriter(stream), config))
+            {
+                var info = new[] { new { productID, description, amount } };
+                csv.WriteRecords(info);
+            }
         }
     }
 }

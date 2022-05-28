@@ -13,6 +13,14 @@ namespace StockManager.Manager
         public IStockManager AddNewStock(Stock stock);
 
         /// <summary>
+        /// Adds an extra quantity of stock with given product ID to the stock manager.
+        /// </summary>
+        /// <param name="productID">The product ID to update.</param>
+        /// <param name="quantity">Number of stock to add.</param>
+        /// <returns>The StockManager with updated information.</returns>
+        public IStockManager AddStock(int productID, int quantity = 1);
+
+        /// <summary>
         /// Remove a stock from the stock manager.
         /// </summary>
         /// <param name="productID">The product ID to remove.</param>
@@ -26,14 +34,6 @@ namespace StockManager.Manager
         public IStockManager RemoveAllStock();
 
         /// <summary>
-        /// Adds an extra quantity of stock with given product ID to the stock manager.
-        /// </summary>
-        /// <param name="productID">The product ID to update.</param>
-        /// <param name="quantity">Number of stock to add.</param>
-        /// <returns>The StockManager with updated information.</returns>
-        public IStockManager AddStock(int productID, int quantity = 1);
-
-        /// <summary>
         /// Sells a number of stock with a given price per stock.
         /// </summary>
         /// <param name="productID">The product ID to sell.</param>
@@ -43,10 +43,33 @@ namespace StockManager.Manager
         public IStockManager SellStock(int productID, double pricePerStock, int quantity = 1);
 
         /// <summary>
+        /// Edits the price of a given stock.
+        /// </summary>
+        /// <param name="productID">Product ID to change price of.</param>
+        /// <param name="pricePerStock">New price per stock.</param>
+        /// <returns>The StockManager with updated information.</returns>
+        public IStockManager EditStockPrice(int productID, double pricePerStock);
+
+        /// <summary>
+        /// Edits the safe stock amount of a stock.
+        /// </summary>
+        /// <param name="productID">Product ID to change safe stock amount of.</param>
+        /// <param name="safeStockAmount">New safe stock amount.</param>
+        /// <returns>The StockManager with updated information.</returns>
+        public IStockManager EditSafeStockAmount(int productID, int safeStockAmount);
+
+        /// <summary>
         /// Return all of the stocks in the manager.
         /// </summary>
         /// <returns>List of all stocks.</returns>
         public List<Stock> GetAllStocks();
+
+        /// <summary>
+        /// Search for all the stocks that match a description.
+        /// </summary>
+        /// <param name="description">Description to search for</param>
+        /// <returns>List of all stocks matching the description.</returns>
+        public List<Stock> SearchForStockFromDescription(string description);
 
         /// <summary>
         /// Gets the product ID from a stock description.
@@ -88,5 +111,13 @@ namespace StockManager.Manager
         /// </summary>
         /// <returns>A stock report of all the stocks.</returns>
         public string GetStockReport();
+
+        /// <summary>
+        /// Produce a report ordering more stock.
+        /// </summary>
+        /// <param name="productID">Product ID to order for.</param>
+        /// <param name="description">The stock description.</param>
+        /// <param name="quantity">The amount to order.</param>
+        public void ProduceStockOrder(int productID, string description, int quantity);
     }
 }
