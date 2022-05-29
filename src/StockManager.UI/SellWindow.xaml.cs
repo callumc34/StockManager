@@ -29,7 +29,11 @@ namespace StockManager.UI
             this.stock = stock;
 
             this.CancelButton.Click += (_, _) => this.Close();
-            this.SellButton.Click += (_, _) => callback(stock, this.discount, this.quantity);
+            this.SellButton.Click += (_, _) =>
+            {
+                this.UpdateTotal();
+                callback(stock, this.discount, this.quantity);
+            };
 
             this.QuantityButton.Click += (_, _) => this.UpdateTotal();
 
@@ -46,6 +50,8 @@ namespace StockManager.UI
                     this.UpdateTotal();
                 }
             };
+
+            this.UpdateTotal();
         }
 
         private void UpdateTotal()
@@ -62,7 +68,7 @@ namespace StockManager.UI
                 this.quantity = this.stock.Quantity;
             }
 
-            this.TotalText.Text = string.Format("{0:0.00}", this.discount * this.quantity);
+            this.TotalText.Text = string.Format("{0:0.00}", this.discount * this.stock.Price * this.quantity);
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)

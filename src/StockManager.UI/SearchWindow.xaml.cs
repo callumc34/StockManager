@@ -56,7 +56,7 @@ namespace StockManager.UI
 
             if (type == "ProductID")
             {
-                if (!int.TryParse(type, out int value))
+                if (!int.TryParse(text, out int value))
                 {
                     this.SetData(new List<Stock>());
                     return;
