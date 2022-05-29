@@ -27,5 +27,6 @@ namespace StockManager.UI
         {
             return stockManager;
         }
+
     }
 }

@@ -38,7 +38,7 @@ namespace StockManager.Database
         /// <param name="quantity">Amount of stock.</param>
         [BsonConstructor]
         public DatabaseStock(double price, string description, int productID, int safeStockAmount, int quantity)
-            : base(price, description, productID, safeStockAmount, quantity)
+            : base(productID, description, price, safeStockAmount, quantity)
         {
         }
 
@@ -48,7 +48,7 @@ namespace StockManager.Database
         /// </summary>
         /// <param name="stock">The stock to generate from.</param>
         public DatabaseStock(Stock stock)
-            : base(stock.Price, stock.Description, stock.ProductID, stock.SafeStockAmount, stock.Quantity)
+            : base(stock.ProductID, stock.Description, stock.Price, stock.SafeStockAmount, stock.Quantity)
         {
         }
     }

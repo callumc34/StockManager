@@ -17,12 +17,22 @@ namespace StockManager.Tests.DatabaseManager
         private static readonly DatabaseStockManager Manager = App.GetStockManager();
 
         private static Faker<Stock> testStockGenerator = new Faker<Stock>()
-            .CustomInstantiator(f => new Stock(0, f.Random.Utf16String(5, 100), f.Random.Int(0, 100000), 0, 0))
+            .CustomInstantiator(f => new Stock(f.Random.Int(0, 1000000), f.Random.Utf16String(5, 100), 0,  0, 0))
             .RuleFor(s => s.Price, f => f.Random.Double(0.5, 50))
             .RuleFor(s => s.SafeStockAmount, f => f.Random.Int(5, 50))
             .RuleFor(s => s.Quantity, f => f.Random.Int(10, 100));
 
         private static Stock testStock = testStockGenerator.Generate();
+
+        /// <summary>
+        /// Initialise the class tests.
+        /// </summary>
+        /// <param name="testContext">The test context.</param>
+        [ClassInitialize]
+        public static void Initialize(TestContext testContext)
+        {
+            Manager.TestMode = true;
+        }
 
         /// <summary>
         /// All stocks should appear on the database and be retrieved.
@@ -119,6 +129,21 @@ namespace StockManager.Tests.DatabaseManager
         }
 
         /// <summary>
+        /// Stock quantity should be changeable.
+        /// </summary>
+        [TestMethod]
+        public void StockQuantityShouldEdit()
+        {
+            this.NextTestStock();
+            Manager.AddNewStock(testStock);
+            Assert.IsNotNull(Manager.GetStockFromProductID(testStock.ProductID));
+            Manager.EditStockQuantity(testStock.ProductID, testStock.Quantity * 2);
+            Stock? stock = Manager.GetStockFromProductID(testStock.ProductID);
+            Assert.IsNotNull(stock);
+            Assert.AreEqual(stock.Quantity, testStock.Quantity * 2);
+        }
+
+        /// <summary>
         /// Stock safe amount should be editable.
         /// </summary>
         [TestMethod]
@@ -184,7 +209,9 @@ namespace StockManager.Tests.DatabaseManager
             Manager.SellStock(testStock.ProductID, testStock.Price, testStock.Quantity - testStock.SafeStockAmount);
             Stock? stock = Manager.GetStockFromProductID(testStock.ProductID);
             Assert.IsNotNull(stock);
-            Assert.AreEqual(stock.TotalFromSales, testStock.Price * (testStock.Quantity - testStock.SafeStockAmount));
+            double expected = testStock.Price * (testStock.Quantity - testStock.SafeStockAmount);
+            Assert.AreEqual(stock.TotalFromSales, expected);
+            Assert.AreEqual(Manager.GetTotalMoneyFromStock(testStock.ProductID), expected);
             Assert.AreEqual(testStock.SafeStockAmount, stock.Quantity);
         }
 
@@ -192,16 +219,72 @@ namespace StockManager.Tests.DatabaseManager
         /// Stocks with descriptions should be found when searched for.
         /// </summary>
         [TestMethod]
-        public void StocksShouldBeFound()
+        public void StocksShouldBeFoundWithDescription()
         {
             Manager.RemoveAllStock();
             Assert.AreEqual(0, Manager.GetAllStocks().Count);
             Stock firstStock = new Stock(0, "Test Stock", 0, 5, 100);
-            Stock secondStock = new Stock(0, "Stock with a test", 2, 5, 100);
+            Stock secondStock = new Stock(2, "Stock with a test", 2, 5, 100);
+            Stock thirdStock = new Stock(5, "random", 5, 10, 1000);
             Manager.AddNewStock(firstStock);
             Manager.AddNewStock(secondStock);
-            Assert.AreEqual(2, Manager.GetAllStocks().Count);
-            Assert.AreEqual(2, Manager.SearchForStockFromDescription("test").Count);
+            Manager.AddNewStock(thirdStock);
+            Assert.AreEqual(3, Manager.GetAllStocks().Count);
+            Assert.AreEqual(2, Manager.SearchForStocksFromDescription("test").Count);
+        }
+
+        /// <summary>
+        /// Stocks with product ID should be found when searched for,
+        /// </summary>
+        [TestMethod]
+        public void StocksShouldBeFoundWithProductID()
+        {
+            Manager.RemoveAllStock();
+            Assert.AreEqual(0, Manager.GetAllStocks().Count);
+            Stock firstStock = new Stock(12345, "Test Stock", 5, 2, 100);
+            Stock secondStock = new Stock(312355, "Second Test Stock", 7, 10, 50);
+            Stock thirdStock = new Stock(999, "Third Test Stock", 50, 50, 1000);
+            Manager.AddNewStock(firstStock);
+            Manager.AddNewStock(secondStock);
+            Manager.AddNewStock(thirdStock);
+            Assert.AreEqual(3, Manager.GetAllStocks().Count);
+            Assert.AreEqual(2, Manager.SearchForStocksFromProductID(123).Count);
+        }
+
+        /// <summary>
+        /// Should be able to get the product id from description.
+        /// </summary>
+        [TestMethod]
+        public void ProductIDFromDescription()
+        {
+            this.NextTestStock();
+            Manager.AddNewStock(testStock);
+            Assert.AreEqual(testStock.ProductID, Manager.GetProductIDFromDescription(testStock.Description));
+        }
+
+        /// <summary>
+        /// Should be able to get the stock from the description.
+        /// </summary>
+        [TestMethod]
+        public void StockFromDescription()
+        {
+            this.NextTestStock();
+            Manager.AddNewStock(testStock);
+            Assert.AreEqual(testStock, Manager.GetStockFromDescription(testStock.Description));
+        }
+
+        /// <summary>
+        /// Should be able to generate a valid stock report.
+        /// </summary>
+        [TestMethod]
+        public void StockReportShouldBeValid()
+        {
+            Manager.RemoveAllStock();
+            Assert.AreEqual(0, Manager.GetAllStocks().Count);
+            this.NextTestStock();
+            Manager.AddNewStock(testStock);
+            string stockReport = testStock.ToString() + "---\n";
+            Assert.AreEqual(Manager.GetStockReport(), stockReport);
         }
 
         /// <summary>

@@ -14,6 +14,11 @@ namespace StockManager.Database
     {
         private MongoManager database;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the database is in test mode.
+        /// </summary>
+        public bool TestMode { get { return this.database.TestMode; } set { this.database.TestMode = value; } }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseStockManager"/> class.
@@ -119,12 +124,28 @@ namespace StockManager.Database
             return this;
         }
 
+        /// <inheritdoc />
+        public IStockManager EditStockQuantity(int productID, int quantity)
+        {
+            Stock? stock = this.GetStockFromProductID(productID);
+
+            if (stock == null || quantity < 0)
+            {
+                return this;
+            }
+
+            var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
+            var update = Builders<DatabaseStock>.Update.Set("Quantity", quantity);
+            this.database.GetCollection().UpdateOne(filter, update);
+            return this;
+        }
+
         /// <inheritdoc/>
         public IStockManager EditSafeStockAmount(int productID, int safeStockAmount)
         {
             Stock? stock = this.GetStockFromProductID(productID);
 
-            if (stock == null)
+            if (stock == null || safeStockAmount < 0)
             {
                 return this;
             }
@@ -160,7 +181,7 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
-        public List<Stock> SearchForStockFromDescription(string description)
+        public List<Stock> SearchForStocksFromDescription(string description)
         {
             IEnumerable<Stock> stocks = this.database.GetCollection()
                 .AsQueryable()
@@ -170,9 +191,29 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
+        public List<Stock> SearchForStocksFromProductID(int productID)
+        {
+            IEnumerable<Stock> collection = this.database.GetCollection()
+                .AsQueryable()
+                .ToList();
+
+            // LINQ Does not support ToString on integers
+            List<Stock> stocks = new List<Stock>();
+            foreach (Stock stock in collection)
+            {
+                if (stock.ProductID.ToString().Contains(productID.ToString()))
+                {
+                    stocks.Add(stock);
+                }
+            }
+
+            return stocks;
+        }
+
+        /// <inheritdoc />
         public int GetProductIDFromDescription(string description)
         {
-            Stock? found = this.SearchForStockFromDescription(description).FirstOrDefault();
+            Stock? found = this.SearchForStocksFromDescription(description).FirstOrDefault();
             if (found != null)
             {
                 return found.ProductID;
@@ -184,7 +225,7 @@ namespace StockManager.Database
         /// <inheritdoc />
         public Stock? GetStockFromDescription(string description)
         {
-            return this.SearchForStockFromDescription(description).FirstOrDefault();
+            return this.SearchForStocksFromDescription(description).FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -192,17 +233,6 @@ namespace StockManager.Database
         {
             var filter = Builders<DatabaseStock>.Filter.Eq("ProductID", productID);
             return this.database.GetCollection().Find(filter).FirstOrDefault();
-        }
-
-        /// <inheritdoc />
-        public string GetStockReport()
-        {
-            StringBuilder report = new StringBuilder();
-            foreach (Stock stock in this.GetAllStocks())
-            {
-                report.Append("{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n---\n");
-            }
-            return report.ToString();
         }
 
         /// <inheritdoc />
@@ -219,18 +249,26 @@ namespace StockManager.Database
         }
 
         /// <inheritdoc />
-        public void ProduceStockOrder(int productID, string description, int amount)
+        public string GetStockReport()
         {
-            if (!File.Exists("StockOrder.csv"))
+            StringBuilder report = new StringBuilder();
+            foreach (Stock stock in this.GetAllStocks())
             {
-                File.Create("StockOrder.csv");
+                report.Append(string.Format("{0}---\n", stock.ToString()));
             }
 
+            return report.ToString();
+        }
+
+
+        /// <inheritdoc />
+        public void ProduceStockOrder(int productID, string description, int amount)
+        {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = false,
             };
-            using (var stream = File.Open("StockOfer.csv", FileMode.Append))
+            using (var stream = File.Open("StockOrder.csv", FileMode.Append))
             using (var csv = new CsvWriter(new StreamWriter(stream), config))
             {
                 var info = new[] { new { productID, description, amount } };

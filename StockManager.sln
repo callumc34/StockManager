@@ -13,14 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockManager.UI", "src\StockManager.UI\StockManager.UI.csproj", "{56991DCA-8225-4A09-A452-C599DAFD2592}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockManager.Tests.DatabaseManager", "tests\StockManager.Tests.DatabaseManager\StockManager.Tests.DatabaseManager.csproj", "{E26D0533-92E9-4A6E-8A94-DF62732B32C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockManager.Tests.DatabaseManager", "tests\StockManager.Tests.DatabaseManager\StockManager.Tests.DatabaseManager.csproj", "{E26D0533-92E9-4A6E-8A94-DF62732B32C4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FF39BE35-CA9F-4316-AA47-C8F4C8229374} = {FF39BE35-CA9F-4316-AA47-C8F4C8229374}
-		{56991DCA-8225-4A09-A452-C599DAFD2592} = {56991DCA-8225-4A09-A452-C599DAFD2592}
 		{BE6A32EC-A153-4449-B2CC-D0C6F6D1B6F3} = {BE6A32EC-A153-4449-B2CC-D0C6F6D1B6F3}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockManager.UI", "src\StockManager.UI\StockManager.UI.csproj", "{8328C518-1DCE-4A3F-A316-995912C7627B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,14 +35,14 @@ Global
 		{BE6A32EC-A153-4449-B2CC-D0C6F6D1B6F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE6A32EC-A153-4449-B2CC-D0C6F6D1B6F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE6A32EC-A153-4449-B2CC-D0C6F6D1B6F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56991DCA-8225-4A09-A452-C599DAFD2592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56991DCA-8225-4A09-A452-C599DAFD2592}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56991DCA-8225-4A09-A452-C599DAFD2592}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56991DCA-8225-4A09-A452-C599DAFD2592}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E26D0533-92E9-4A6E-8A94-DF62732B32C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E26D0533-92E9-4A6E-8A94-DF62732B32C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E26D0533-92E9-4A6E-8A94-DF62732B32C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E26D0533-92E9-4A6E-8A94-DF62732B32C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8328C518-1DCE-4A3F-A316-995912C7627B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8328C518-1DCE-4A3F-A316-995912C7627B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8328C518-1DCE-4A3F-A316-995912C7627B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8328C518-1DCE-4A3F-A316-995912C7627B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

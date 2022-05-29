@@ -37,8 +37,8 @@ namespace StockManager.Manager
         /// Sells a number of stock with a given price per stock.
         /// </summary>
         /// <param name="productID">The product ID to sell.</param>
-        /// <param name="quantity">Number of stock to sell.</param>
         /// <param name="pricePerStock">Price to sell each stock at.</param>
+        /// <param name="quantity">Number of stock to sell.</param>
         /// <returns>The StockManager with updated information.</returns>
         public IStockManager SellStock(int productID, double pricePerStock, int quantity = 1);
 
@@ -49,6 +49,14 @@ namespace StockManager.Manager
         /// <param name="pricePerStock">New price per stock.</param>
         /// <returns>The StockManager with updated information.</returns>
         public IStockManager EditStockPrice(int productID, double pricePerStock);
+
+        /// <summary>
+        /// Edits the quantity of a given stock.
+        /// </summary>
+        /// <param name="productID">Product ID to change quantity of.</param>
+        /// <param name="quantity">New quantity.</param>
+        /// <returns>The StockManager with updated information.</returns>
+        public IStockManager EditStockQuantity(int productID, int quantity);
 
         /// <summary>
         /// Edits the safe stock amount of a stock.
@@ -69,7 +77,14 @@ namespace StockManager.Manager
         /// </summary>
         /// <param name="description">Description to search for</param>
         /// <returns>List of all stocks matching the description.</returns>
-        public List<Stock> SearchForStockFromDescription(string description);
+        public List<Stock> SearchForStocksFromDescription(string description);
+
+        /// <summary>
+        /// Search for all the stocks that match a product ID.
+        /// </summary>
+        /// <param name="productID">Product ID to search for.</param>
+        /// <returns>List of all stocks matching the product ID.</returns>
+        public List<Stock> SearchForStocksFromProductID(int productID);
 
         /// <summary>
         /// Gets the product ID from a stock description.
